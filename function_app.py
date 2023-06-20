@@ -15,11 +15,11 @@ ex_input_json = {
     "objects": [
         {
             "name": "chair",
-            "dimensions": [1, 1, 1],
+            "dimensions": [1, 1, 1]
         },
         {
             "name": "table",
-            "dimensions": [2, 2, 2],
+            "dimensions": [2, 2, 2]
         }
     ]
 }
@@ -70,38 +70,22 @@ def place_objects(room_dimensions, objects):
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)  
 
-@app.route(route="HttpTrigger")
-def HttpTrigger(req: func.HttpRequest) -> func.HttpResponse:
+@app.route(route="furnish")
+def Furnish(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
-
-    dim_x = req.params.get('dim_x')
-    dim_y = req.params.get('dim_y')
-    dim_z = req.params.get('dim_z')
-    if (not dim_x) or (not dim_y) or (not dim_z):
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            pass
+    try:
+        req_body = req.get_json()
+        dim_x = req_body.get('dim_x')
+        dim_y = req_body.get('dim_y')
+        dim_z = req_body.get('dim_z')
+        objects = req_body.get('objects')
+        if dim_x and dim_y and dim_z and objects:
+            layout = place_objects([dim_x, dim_y, dim_z], objects)
         else:
-            dim_x = req_body.get('dim_x')
-            dim_y = req_body.get('dim_y')
-            dim_z = req_body.get('dim_z')
-
-    if dim_x:
-        objects = [
-        {
-            "name": "chair",
-            "dimensions": [1, 1, 1],
-        },
-        {
-            "name": "table",
-            "dimensions": [2, 2, 2],
-        }
-        ]
-        place_objects([dim_x, dim_y, dim_z], objects)
-        return func.HttpResponse(f"Hello, you've specified a room of dimensions x={dim_x}, y={dim_y}, z={dim_z}. ")
-    else:
+            raise ValueError 
+        return func.HttpResponse(json.dumps(layout),status_code=200)
+    except ValueError:
         return func.HttpResponse(
-             "This function requires the dimensions of a room to be passed as a query string or in the request body, as parameters dim_x, dim_y, dim_z.",
-             status_code=200
+             "This function requires the dimensions of a room to be passed as a query string or in the request body, as parameters dim_x, dim_y, dim_z and a list of objects.",
+             status_code=422
         )
