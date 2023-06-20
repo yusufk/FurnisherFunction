@@ -88,6 +88,17 @@ def HttpTrigger(req: func.HttpRequest) -> func.HttpResponse:
             dim_z = req_body.get('dim_z')
 
     if dim_x:
+        objects = [
+        {
+            "name": "chair",
+            "dimensions": [1, 1, 1],
+        },
+        {
+            "name": "table",
+            "dimensions": [2, 2, 2],
+        }
+        ]
+        place_objects([dim_x, dim_y, dim_z], objects)
         return func.HttpResponse(f"Hello, you've specified a room of dimensions x={dim_x}, y={dim_y}, z={dim_z}. ")
     else:
         return func.HttpResponse(
