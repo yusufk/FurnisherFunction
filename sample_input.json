@@ -1,0 +1,13 @@
+{
+    "room_dimensions": [10, 10, 10],
+    "objects": [
+        {
+            "name": "chair",
+            "dimensions": [1, 1, 1]
+        },
+        {
+            "name": "table",
+            "dimensions": [2, 4, 1]
+        }
+    ]
+}
