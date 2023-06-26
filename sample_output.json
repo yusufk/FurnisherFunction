@@ -1,15 +1,67 @@
 {
-    "room_dimensions": [10, 10, 10],
+    "room_dimensions": {
+        "dim_x": 10,
+        "dim_y": 4,
+        "dim_z": 10
+    },
     "objects": [
         {
-            "name": "chair",
-            "position": [3, 1, 0.5],
-            "rotation": [0, 0, 0]
+            "name": "Chair",
+            "description": "A white, wooden chair.",
+            "dimensions": {
+                "dim_x": 1,
+                "dim_y": 1,
+                "dim_z": 1
+            },
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+            },
+            "rotation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
         },
         {
-            "name": "table",
-            "position": [5, 5, 0.5],
-            "rotation": [0, 0, 0]
+            "name": "Table",
+            "description": "A wooden table.",
+            "dimensions": {
+                "dim_x": 2,
+                "dim_y": 4,
+                "dim_z": 1
+            },
+            "position": {
+                "x": 5,
+                "y": 5,
+                "z": 0.5
+            },
+            "rotation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
+        },
+        {
+            "name": "Vase",
+            "description": "A decorative vase.",
+            "dimensions": {
+                "dim_x": 0.5,
+                "dim_y": 1,
+                "dim_z": 0.5
+            },
+            "position": {
+                "x": 6,
+                "y": 5.5,
+                "z": 1.5
+            },
+            "rotation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
         }
-    ]
+    ],
+    "approach": "Place the table at the center of the room. Place the chair at the table. Place the vase on the table."
 }

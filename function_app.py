@@ -55,9 +55,9 @@ def Furnish(req: func.HttpRequest) -> func.HttpResponse:
     try:
         req_body = req.get_json()
         logging.debug(req_body)
-        dim_x = req_body.get('dim_x')
-        dim_y = req_body.get('dim_y')
-        dim_z = req_body.get('dim_z')
+        dim_x = req_body.get('room_dimensions', {}).get('dim_x')
+        dim_y = req_body.get('room_dimensions', {}).get('dim_y')
+        dim_z = req_body.get('room_dimensions', {}).get('dim_z')
         objects = req_body.get('objects')
         if dim_x and dim_y and dim_z and objects:
             layout = place_objects([dim_x, dim_y, dim_z], objects)

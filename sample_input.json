@@ -1,13 +1,36 @@
 {
-    "room_dimensions": [10, 10, 10],
+    "room_dimensions": {
+        "dim_x": 10,
+        "dim_y": 4,
+        "dim_z": 10
+    },
     "objects": [
         {
-            "name": "chair",
-            "dimensions": [1, 1, 1]
+            "name": "Chair",
+            "description": "A white, wooden chair.",
+            "dimensions": {
+                "dim_x": 1,
+                "dim_y": 1,
+                "dim_z": 1
+            }
         },
         {
-            "name": "table",
-            "dimensions": [2, 4, 1]
+            "name": "Table",
+            "description": "A wooden table.",
+            "dimensions": {
+                "dim_x": 2,
+                "dim_y": 4,
+                "dim_z": 1
+            }
+        },
+        {
+            "name": "Vase",
+            "description": "A decorative vase.",
+            "dimensions": {
+                "dim_x": 0.5,
+                "dim_y": 1,
+                "dim_z": 0.5
+            }
         }
     ]
 }
