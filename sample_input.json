@@ -6,6 +6,7 @@
     },
     "objects": [
         {
+            "id": "object1",
             "name": "Chair",
             "description": "A white, wooden chair.",
             "dimensions": {
@@ -15,15 +16,17 @@
             }
         },
         {
+            "id": "object2",
             "name": "Table",
             "description": "A wooden table.",
             "dimensions": {
                 "dim_x": 2,
-                "dim_y": 4,
-                "dim_z": 1
+                "dim_y": 1.5,
+                "dim_z": 3
             }
         },
         {
+            "id": "object3",
             "name": "Vase",
             "description": "A decorative vase.",
             "dimensions": {
