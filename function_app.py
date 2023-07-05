@@ -27,15 +27,14 @@ def place_objects(room_dimensions, objects):
         prompt_pre = file.read()
     # Create a completion
     response = openai.Completion.create(
-    engine="davinci3_deployment_model",
+    engine=os.getenv("OPENAI_ENGINE"),
     prompt=prompt_pre + "\n\n\
         Input: \n" + ex_input_json + "\n\n\
-        Reasoning: The table is the largest object, therefore placing it in the center of the room. The chair is usually placed next to the table. \n\n\
         Output: \n" + ex_output_json + "\n\n\
         Input: \n" + json.dumps(input_json) + "\n\n\
-        Reasoning: ",
+        Output: ",
 
-    temperature=0.89,
+    temperature=0.2,
     max_tokens=2544,
     top_p=1,
     frequency_penalty=0,
