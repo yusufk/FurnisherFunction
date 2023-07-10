@@ -5,7 +5,8 @@ The walls of the room are located at the edges of the floor, and have a thicknes
 One wall is at dim_x/2 + 0.5 away from the center of the floor in the negative direction, with the opposite wall in the positive direction away.
 The other two walls are dim_z/2 + 0.5 away, one in the positive and the other negative.
 All objects must be placed within the walls of the room.
-The returned object position is assumed to be the center of the object and is specified by position x, y and z coordinates, where y is the height of the object.
+The returned object position is assumed to be the center of the object and is specified by position x, y and z coordinates, so y*2 would be total the height of the object.
 Take this into consideration when placing objects near walls as the distance from the wall must be at least 1/2 the width or depth of the object away from the wall. 
 Place the objects in the room in a logical, practical manner with creative design principles, using the objects description as a guide. 
-Be careful not to let objects overlap.
+Avoid objects overlapping. 
+The rotation coordinates can be used to rotate the object in degrees around the objects center.
