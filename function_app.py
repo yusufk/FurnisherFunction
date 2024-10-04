@@ -1,13 +1,13 @@
 import azure.functions as func
 import logging
-import openai
+from openai import AzureOpenAI
+
+client = AzureOpenAI(azure_endpoint=os.getenv("OPENAI_ENDPOINT"),
+api_version="2022-12-01",
+api_key=os.getenv("OPENAI_API_KEY"))
 import json
 import os
 
-openai.api_type = "azure"
-openai.api_base = os.getenv("OPENAI_ENDPOINT")
-openai.api_version = "2022-12-01"
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Example JSON objects showing the format of the input and output loaded from files
 with open('sample_input.json', 'r', encoding='utf-8') as f:
@@ -26,14 +26,13 @@ def place_objects(room_dimensions, objects):
     with open('prompt.txt', 'r', encoding='utf-8') as file:
         prompt_pre = file.read()
     # Create a completion
-    response = openai.Completion.create(
-    engine=os.getenv("OPENAI_ENGINE"),
+    response = client.completions.create(model=os.getenv("OPENAI_ENGINE"),
     prompt=prompt_pre + "\n\n\
         Input: \n" + ex_input_json + "\n\n\
         Output: \n" + ex_output_json + "\n\n\
         Input: \n" + json.dumps(input_json) + "\n\n\
         Output: ",
-
+    
     temperature=0.2,
     max_tokens=2544,
     top_p=1,
