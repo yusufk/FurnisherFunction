@@ -68,3 +68,8 @@ def Furnish(req: func.HttpRequest) -> func.HttpResponse:
              "This function requires the dimensions of a room to be passed as a query string or in the request body, as parameters dim_x, dim_y, dim_z and a list of objects.",
              status_code=422
         )
+    except Exception as e:
+        return func.HttpResponse(
+            f"An unexpected error occurred: {str(e)}",
+            status_code=500
+        )
