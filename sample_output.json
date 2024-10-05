@@ -8,7 +8,8 @@
         {
             "id": "object1",
             "name": "Chair",
-            "description": "A white, wooden chair.",
+            "description": "A wooden chair.",
+            "colour": "#964B00",
             "dimensions": {
                 "dim_x": 1,
                 "dim_y": 1,
@@ -29,6 +30,7 @@
             "id": "object2",
             "name": "Table",
             "description": "A wooden table.",
+            "colour": "#964B00",
             "dimensions": {
                 "dim_x": 2,
                 "dim_y": 1.5,
@@ -49,6 +51,7 @@
             "id": "object3",
             "name": "Vase",
             "description": "A decorative vase.",
+            "colour": "#ff00ff",
             "dimensions": {
                 "dim_x": 0.5,
                 "dim_y": 1,
@@ -66,5 +69,5 @@
             }
         }
     ],
-    "approach": "I'm placing the table at the center of the room, as the central focal point. Also, placing the chair at the table and the vase on the centre of table top."
+    "approach": "I'm placing the table at the center of the room, as the central focal point. Also, placing the chair at the table and the vase on the centre of table top. I also corrected the colours of the objects."
 }
