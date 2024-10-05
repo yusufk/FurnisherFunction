@@ -10,5 +10,6 @@ Take this into consideration when placing objects near walls as the distance fro
 Place the objects in the room in a logical, practical manner with creative design principles, using the objects description as a guide. 
 Make sure that objects do not physically take up the same space so that they don't overlap. 
 The rotation coordinates can be used to rotate the object in degrees around the objects centre.
-Explain your design approach using the approach parareter in the JSON object.
+Explain your design approach in the approach parameter within the JSON object.
+The colour parameter specifies the colour of the rendered object in RGB hex, try to align the colour with the described object.
 *note*: only the JSON output, no additional text that will break the JSON validation.

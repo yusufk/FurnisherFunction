@@ -3,6 +3,11 @@ import logging
 from openai import AzureOpenAI
 import json
 import os
+from ratelimit import limits, sleep_and_retry
+
+# Define the rate limit: 10 calls per minute
+CALLS = 10
+PERIOD = 3600
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -23,6 +28,8 @@ with open('sample_input.json', 'r', encoding='utf-8') as f:
 with open('sample_output.json', 'r', encoding='utf-8') as f:
     ex_output_json = f.read().strip('\n')
 
+@sleep_and_retry
+@limits(calls=CALLS, period=PERIOD)
 def place_objects(room_dimensions, objects):
     input_json = {
         "room_dimensions": room_dimensions,
