@@ -1,4 +1,5 @@
 {
+    "approach": "I'm going to place the table at the center of the room, as the central focal point. It makes sense to place the chair at the table and the vase on the centre of table top. I am also correcting the colours of the objects to be more realistic.",
     "room_dimensions": {
         "dim_x": 10,
         "dim_y": 4,
@@ -68,6 +69,5 @@
                 "z": 0
             }
         }
-    ],
-    "approach": "I'm placing the table at the center of the room, as the central focal point. Also, placing the chair at the table and the vase on the centre of table top. I also corrected the colours of the objects."
+    ]
 }
