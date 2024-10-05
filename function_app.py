@@ -32,7 +32,6 @@ def place_objects(room_dimensions, objects):
     # Payload for the request
     with open('prompt.txt', 'r', encoding='utf-8') as file:
         context = file.read()
-    prompt="\n\nInput: \n" + ex_input_json + "\n\nOutput: \n" + ex_output_json + "\n\nInput: \n" + json.dumps(input_json) + "\n\nOutput: ",
     
     response = client.chat.completions.create(
         model=os.getenv("AZURE_DEPLOYMENT_MODEL"), 
@@ -61,7 +60,7 @@ def Furnish(req: func.HttpRequest) -> func.HttpResponse:
         objects = req_body.get('objects')
         if dim_x and dim_y and dim_z and objects:
             layout = place_objects([dim_x, dim_y, dim_z], objects)
-            return func.HttpResponse(json.dumps(layout), status_code=200)
+            return func.HttpResponse(layout, status_code=200)
         else:
             raise ValueError("Missing required parameters")
     except ValueError as ve:
