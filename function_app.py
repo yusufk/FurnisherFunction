@@ -3,15 +3,30 @@ import logging
 from openai import AzureOpenAI
 import json
 import os
-import requests
+import time
 
-# Configuration
-API_KEY = os.getenv("OPENAI_API_KEY")
-ENDPOINT = os.getenv("OPENAI_ENDPOINT")
-headers = {
-    "Content-Type": "application/json",
-    "api-key": API_KEY,
-}
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Setup Azure Open AI
+client = AzureOpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),  
+    api_version=os.getenv("OPENAI_API_VERSION"),
+    azure_endpoint = os.getenv("OPENAI_API_BASE")
+    )
+
+# Create an assistant
+with open('prompt.txt', 'r', encoding='utf-8') as file:
+        context = file.read()
+assistant = client.beta.assistants.create(
+    name="Jarvis",
+    instructions=context,
+    tools=[{"type": "code_interpreter"}],
+    model=os.getenv("ENGINE")
+)
+
+# Start a conversation
+conversation = client.beta.threads.create()
 
 # Example JSON objects showing the format of the input and output loaded from files
 with open('sample_input.json', 'r', encoding='utf-8') as f:
@@ -24,42 +39,35 @@ def place_objects(room_dimensions, objects):
         "room_dimensions": room_dimensions,
         "objects": objects
     }
-    with open('prompt.txt', 'r', encoding='utf-8') as file:
-        prompt_pre = file.read()
 
     # Payload for the request
-    prompt=prompt_pre + "\n\nInput: \n" + ex_input_json + "\n\nOutput: \n" + ex_output_json + "\n\nInput: \n" + json.dumps(input_json) + "\n\nOutput: ",
-    payload = {
-    "messages": [
-        {
-        "role": "system",
-        "content": [
-            {
-            "type": "text",
-            "text": prompt
-            }
-        ]
-        }
-    ],
-    "temperature": 0.7,
-    "top_p": 0.95,
-    "max_tokens": 4096
-    }
+    prompt="\n\nInput: \n" + ex_input_json + "\n\nOutput: \n" + ex_output_json + "\n\nInput: \n" + json.dumps(input_json) + "\n\nOutput: ",
+    
+    # Add the user question to the thread
+    message = client.beta.threads.messages.create(
+        thread_id=conversation.id,
+        role="user",
+        content=prompt
+    )
 
-    # Send request
-    try:
-        response = requests.post(ENDPOINT, headers=headers, json=payload)
-        response.raise_for_status()  # Will raise an HTTPError if the HTTP request returned an unsuccessful status code
-    except requests.RequestException as e:
-        raise SystemExit(f"Failed to make the request. Error: {e}")
-    
-    # Parse the response to extract the correct JSON payload
-    json_response = response.json()
-    for message in json_response:
-        if message['role'] == 'assistant':
-            return message['content'][0]['text']
-    
-    raise ValueError("No valid response from assistant")
+    # Run the thread
+    run = client.beta.threads.runs.create(
+    thread_id=conversation.id,
+    assistant_id=assistant.id,
+    )
+    status = run.status
+
+    # Wait till the assistant has responded
+    while status not in ["completed", "cancelled", "expired", "failed"]:
+        time.sleep(5)
+        run = client.beta.threads.runs.retrieve(thread_id=conversation.id,run_id=run.id)
+        status = run.status
+
+    messages = client.beta.threads.messages.list(
+    thread_id=conversation.id
+    )
+    message =  messages.data[0].content[0].text.value
+    return message
 
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -85,8 +93,10 @@ def Furnish(req: func.HttpRequest) -> func.HttpResponse:
             status_code=422
         )
     except Exception as e:
-        logging.error("Unexpected error: %s", str(e))
+        logging.error("Unexpected error: %s", str(e), exc_info=True)
         return func.HttpResponse(
             f"An unexpected error occurred: {str(e)}",
             status_code=500
         )
+    finally:
+        logging.info('Request processing completed.')
