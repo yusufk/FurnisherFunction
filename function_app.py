@@ -3,30 +3,19 @@ import logging
 from openai import AzureOpenAI
 import json
 import os
-import time
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Setup Azure Open AI
+# set environment variables before importing any other code
+from dotenv import load_dotenv
+load_dotenv()
+
 client = AzureOpenAI(
-    api_key=os.getenv("OPENAI_API_KEY"),  
-    api_version=os.getenv("OPENAI_API_VERSION"),
-    azure_endpoint = os.getenv("OPENAI_API_BASE")
-    )
-
-# Create an assistant
-with open('prompt.txt', 'r', encoding='utf-8') as file:
-        context = file.read()
-assistant = client.beta.assistants.create(
-    name="Jarvis",
-    instructions=context,
-    tools=[{"type": "code_interpreter"}],
-    model=os.getenv("ENGINE")
+  azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
+  api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
+  api_version=os.getenv("OPENAI_API_VERSION")
 )
-
-# Start a conversation
-conversation = client.beta.threads.create()
 
 # Example JSON objects showing the format of the input and output loaded from files
 with open('sample_input.json', 'r', encoding='utf-8') as f:
@@ -39,34 +28,23 @@ def place_objects(room_dimensions, objects):
         "room_dimensions": room_dimensions,
         "objects": objects
     }
-
+    
     # Payload for the request
+    with open('prompt.txt', 'r', encoding='utf-8') as file:
+        context = file.read()
     prompt="\n\nInput: \n" + ex_input_json + "\n\nOutput: \n" + ex_output_json + "\n\nInput: \n" + json.dumps(input_json) + "\n\nOutput: ",
     
-    # Add the user question to the thread
-    message = client.beta.threads.messages.create(
-        thread_id=conversation.id,
-        role="user",
-        content=prompt
+    response = client.chat.completions.create(
+        model=os.getenv("AZURE_DEPLOYMENT_MODEL"), 
+        messages=[
+            {"role": "system", "content": context},
+            {"role": "user", "content": ex_input_json},
+            {"role": "assistant", "content": ex_output_json},
+            {"role": "user", "content": json.dumps(input_json)}
+        ]
     )
 
-    # Run the thread
-    run = client.beta.threads.runs.create(
-    thread_id=conversation.id,
-    assistant_id=assistant.id,
-    )
-    status = run.status
-
-    # Wait till the assistant has responded
-    while status not in ["completed", "cancelled", "expired", "failed"]:
-        time.sleep(5)
-        run = client.beta.threads.runs.retrieve(thread_id=conversation.id,run_id=run.id)
-        status = run.status
-
-    messages = client.beta.threads.messages.list(
-    thread_id=conversation.id
-    )
-    message =  messages.data[0].content[0].text.value
+    message = response.choices[0].message.content
     return message
 
 

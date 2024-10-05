@@ -3,3 +3,4 @@
 azure-functions
 openai
 simplejson
+python-dotenv
