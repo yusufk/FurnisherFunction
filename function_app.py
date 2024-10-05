@@ -3,12 +3,15 @@ import logging
 from openai import AzureOpenAI
 import json
 import os
+import requests
 
-client = AzureOpenAI(
-    azure_endpoint=os.getenv("OPENAI_ENDPOINT"),
-    api_version="2022-12-01",
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+# Configuration
+API_KEY = os.getenv("OPENAI_API_KEY")
+ENDPOINT = os.getenv("OPENAI_ENDPOINT")
+headers = {
+    "Content-Type": "application/json",
+    "api-key": API_KEY,
+}
 
 # Example JSON objects showing the format of the input and output loaded from files
 with open('sample_input.json', 'r', encoding='utf-8') as f:
@@ -23,24 +26,41 @@ def place_objects(room_dimensions, objects):
     }
     with open('prompt.txt', 'r', encoding='utf-8') as file:
         prompt_pre = file.read()
+
+    # Payload for the request
+    prompt=prompt_pre + "\n\nInput: \n" + ex_input_json + "\n\nOutput: \n" + ex_output_json + "\n\nInput: \n" + json.dumps(input_json) + "\n\nOutput: ",
+    payload = {
+    "messages": [
+        {
+        "role": "system",
+        "content": [
+            {
+            "type": "text",
+            "text": prompt
+            }
+        ]
+        }
+    ],
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "max_tokens": 4096
+    }
+
+    # Send request
     try:
-        response = client.completions.create(
-            model=os.getenv("OPENAI_ENGINE"),
-            prompt=prompt_pre + "\n\nInput: \n" + ex_input_json + "\n\nOutput: \n" + ex_output_json + "\n\nInput: \n" + json.dumps(input_json) + "\n\nOutput: ",
-            temperature=0.2,
-            max_tokens=2544,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            best_of=1,
-            stop=None
-        )
-        logging.info("OpenAI API response: %s", response.choices[0].text)
-        json_response = json.loads("{" + response.choices[0].text.split("{", 1)[1].rsplit("}", 1)[0] + "}")
-        return json_response
-    except Exception as e:
-        logging.error("Error in place_objects: %s", str(e))
-        raise
+        response = requests.post(ENDPOINT, headers=headers, json=payload)
+        response.raise_for_status()  # Will raise an HTTPError if the HTTP request returned an unsuccessful status code
+    except requests.RequestException as e:
+        raise SystemExit(f"Failed to make the request. Error: {e}")
+    
+    # Parse the response to extract the correct JSON payload
+    json_response = response.json()
+    for message in json_response:
+        if message['role'] == 'assistant':
+            return message['content'][0]['text']
+    
+    raise ValueError("No valid response from assistant")
+
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 @app.route(route="furnish")

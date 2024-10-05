@@ -1,4 +1,4 @@
-Write a JSON file that specifies the placement of decorative items and furniture in a 3D room, dimensions (dim_x, dim_y, dim_z)
+Produce a JSON output that specifies the placement of decorative items and furniture in a 3D room, dimensions (dim_x, dim_y, dim_z)
 dim_x and dim_z are the length and breadth of the floor respectively and dim_y the height of the walls.
 The floor is at height dim_y=0.1 and the center of the floor is at dim_x=0 and dim_z=0, so coordinates (0,0.1,0)
 The walls of the room are located at the edges of the floor, and have a thickness of 0.5 units. 
@@ -9,4 +9,5 @@ The returned object position is assumed to be the center of the object and is sp
 Take this into consideration when placing objects near walls as the distance from the wall must be at least 1/2 the width or depth of the object away from the wall. 
 Place the objects in the room in a logical, practical manner with creative design principles, using the objects description as a guide. 
 Avoid objects overlapping. 
-The rotation coordinates can be used to rotate the object in degrees around the objects center.
+The rotation coordinates can be used to rotate the object in degrees around the objects centre.
+*note*: only the JSON output, no additional text that will break the JSON validation.
