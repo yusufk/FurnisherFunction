@@ -42,6 +42,7 @@ def place_objects(room_dimensions, objects):
     
     response = client.chat.completions.create(
         model=os.getenv("AZURE_DEPLOYMENT_MODEL"), 
+        max_tokens=1500,  # cap response size to bound per-call cost
         messages=[
             {"role": "system", "content": context},
             {"role": "user", "content": ex_input_json},
@@ -70,6 +71,21 @@ def Furnish(req: func.HttpRequest) -> func.HttpResponse:
         dim_z = req_body.get('room_dimensions', {}).get('dim_z')
         objects = req_body.get('objects')
         if dim_x and dim_y and dim_z and objects:
+            # Authoritative input validation — bound the prompt to limit
+            # Azure OpenAI token cost, regardless of what the caller sends.
+            MAX_OBJECTS = 20
+            MAX_STR = 200
+            MAX_DIM = 1000
+            for name, v in (("dim_x", dim_x), ("dim_y", dim_y), ("dim_z", dim_z)):
+                if not isinstance(v, (int, float)) or v <= 0 or v > MAX_DIM:
+                    raise ValueError(f"{name} out of range")
+            if not isinstance(objects, list) or len(objects) > MAX_OBJECTS:
+                raise ValueError(f"Too many objects (max {MAX_OBJECTS})")
+            for o in objects:
+                if isinstance(o, dict):
+                    for val in o.values():
+                        if isinstance(val, str) and len(val) > MAX_STR:
+                            raise ValueError(f"Field exceeds {MAX_STR} characters")
             layout = place_objects([dim_x, dim_y, dim_z], objects)
             return func.HttpResponse(layout, status_code=200)
         else:
