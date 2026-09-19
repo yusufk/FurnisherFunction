@@ -54,7 +54,11 @@ def place_objects(room_dimensions, objects):
     return message
 
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+# FUNCTION auth level: callers must supply a valid function/host key (?code=...).
+# The public front-end goes through the Cloudflare Worker (furnisher-proxy),
+# which holds the key server-side and enforces CORS. This closes the previous
+# ANONYMOUS exposure where anyone could burn the Azure OpenAI quota.
+app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 @app.route(route="furnish")
 def Furnish(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
