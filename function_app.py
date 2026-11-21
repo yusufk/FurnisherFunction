@@ -5,16 +5,16 @@ import json
 import os
 from ratelimit import limits, sleep_and_retry
 
-# Define the rate limit: 10 calls per minute
-CALLS = 10
-PERIOD = 3600
-
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # set environment variables before importing any other code
 from dotenv import load_dotenv
 load_dotenv()
+
+# Define the rate limit: 10 calls per hour
+CALLS = int(os.getenv("CALL_RATE"))
+PERIOD = int(os.getenv("CALL_PERIOD"))
 
 client = AzureOpenAI(
   azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
